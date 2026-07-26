@@ -53,7 +53,7 @@ class Solution {
 
 2. **Conceptual & Logical Flaws 🧠**
 
-**Flaw A: Comparing Arrays in Java (==)**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+**Flaw A: Comparing Arrays in Java (==)**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 In Java, comparing arrays using `==` checks whether they point to the same memory location, not whether their contents are equal. Even if you created a copy array, `array1` == `array2` would return `false`.
 
 **Flaw B: Reversing In-Place Loses the Original Reference**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -62,7 +62,7 @@ In your loop, you are swapping characters directly inside `res`. If you reverse 
 **Flaw C: You Don't Actually Need to Reverse the Array!**&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 Since you are using two pointers (left moving right, right moving left), you just need to compare the characters at those pointers. If at any point `res[left]` != `res[right]`, it is `not a palindrome`. If left and right meet without any mismatch, it is a `palindrome`.
 
-## Correct answer: ()
+## Correct answer: (Two-Pointer Approach)
 ```
 class Solution {
     public boolean isPalindrome(int x) {
@@ -85,3 +85,48 @@ class Solution {
     }
 }
 ```
+### Key intuition 🔑:
+* **Negative Number Rule:** Any negative integer (e.g., `-121`) ends with a `-` sign when converted to a string (`"121-"`). Since it can't start with a `-`, negative numbers are automatically not palindromes.
+
+* **Two-Pointer Traversal:** By initializing `left = 0` (start) and `right = length - 1` (end), you can check symmetry moving inward toward the center.
+
+* **Early Exit:** The moment `res[left] != res[right]`, the method returns `false` immediately without checking the rest of the array.
+
+* **Early Termination:** The loop runs while `left < right`. For odd-length strings, the middle character doesn't need comparison (it always equals itself). For even-length strings, the pointers cross cleanly.
+
+### 🧪 Step-by-Step Dry Runs:
+**Test Case 1:** `x = 121` (Valid Palindrome)
+Initial Checks & Conversion:
+
+* `x < 0` is `false`.
+
+* `res = ['1', '2', '1']`
+
+* `left = 0`, `right = 2`
+
+**Loop Iterations:** **Iteration 1:** 
+*  `res[0]` (`'1'`) `==` `res[2]` (`'1'`) $\rightarrow$ Match! ✅
+
+* `left` becomes `1`, `right` becomes `1`.
+
+**Loop Condition Check:** `left < right` (`1 < 1`) is `false` $\rightarrow$ Loop exits!
+
+**Return:**
+
+* Returns `true`.
+
+**Test Case 2:** 
+`x = -121` (Negative Number)
+* **Initial Checks:** `x < 0` (`-121 < 0`) is `true`.
+* Immediately returns `false` without allocating memory for string conversion.
+
+**Test Case 3: x = 10 (Invalid Palindrome)**
+
+* **Initial Checks & Conversion:** 
+* `x < 0` is `false`.
+* `res = ['1', '0']`
+* `left = 0`, `right = 1`
+
+* **Loop Iterations:** 
+* **Iteration 1:** `res[0]` (`'1'`) `!=` `res[1]` (`'0'`) $\rightarrow$ Mismatch! ❌
+* Triggers early exit: `return false`.
