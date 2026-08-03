@@ -35,6 +35,7 @@ There are 10 pairs of indices that satisfy the conditions in the statement:
 - `-50 <= nums[i], target <= 50`
 
 ### My answer:
+* **Brute Force Approach:**
 ```
 class Solution {
     public int countPairs(List<Integer> nums, int target) {
@@ -79,7 +80,64 @@ You used `res.add(sum)` and `res.size()`, but you never declared or initialized 
 * **Counting Unique Pairs vs. Total Valid Pairs:**
 You don't need a list or set to collect sums. You simply need a `count` variable that increments whenever `nums.get(i) + nums.get(j) < target`.
 
+* **Two-Pointer Approach:**
+```
+class Solution {
+    public int countPairs(List<Integer> nums, int target) {
+        int n= nums.size();
+        int count=0;
+        int l=0;
+        int r=n-1;
+        for(int i=0; i<n; i++){
+            if(nums.get(l)+nums.get(r) < target){
+                count++;
+            }
+        }
+        return count;
+    }
+}
+```
+#### My Mistakes:
+1. **Missing `Collections.sort(nums)`**
+
+The two-pointer technique relies on the array/list being sorted first.
+
+Without sorting, comparing the left boundary and right boundary gives no guarantee about whether moving `l` or `r` will increase or decrease the sum.
+
+2. **Static Pointers (Infinite Repeat Check)**
+
+In my code,
+
+```
+int l = 0;
+int r = n - 1;
+for (int i = 0; i < n; i++) {
+    if (nums.get(l) + nums.get(r) < target) {
+        count++;
+    }
+}
+```
+- `l` is set to `0` and `r` is set to `n - 1`, but they are never updated inside the loop!
+- The loop runs $n$ times checking the exact same pair (`nums[0]` + `nums[n-1]`) over and over.
+
+**In Case 1:**
+
+`nums` = [`-1`, `1`, `2`, `3`, `1`], `n` = 5, `target` = 2
+
+`nums[0] + nums[4]` **$\rightarrow -1 + 1 = 0 < 2$ (True)** 
+
+Since `l` and `r` never change, it checks this **5** times and outputs **5** (instead of the expected **3**).
+
+3. **Counting Logic: `count++` vs. `count += (r - l)`**
+
+Even if you move `l++` or `r--`, doing `count++` only counts **1 pair** at a time.
+
+When the list is sorted, if `nums[l] + nums[r] < target`, then `nums[l]` added to any element between `l` and `r` will also be strictly less than `target`!
+
+Instead of moving `l` one by one to count them individually, you can add `r - l` directly to `count` in a single step.
+
 #### Correct and Submitted Answer:
+* **Brute Force Approach:**
 
 ```
 class Solution {
@@ -101,3 +159,54 @@ class Solution {
 ```
 - **Time Complexity:** $\mathcal{O}(n^2)$
 - **Space Complexity:** $\mathcal{O}(1)$
+
+* **Two-Pointer Approach:**
+
+```
+class Solution {
+    public int countPairs(List<Integer> nums, int target) {
+        Collections.sort(nums);// Sort the list (Crucial for Two-Pointer!)
+
+        int n= nums.size();
+        int count=0;
+        int l=0;
+        int r=n-1;
+        
+        // Shrink the window until pointers meet
+        while(l<r){
+            if(nums.get(l)+nums.get(r) < target){
+            // All pairs between l and r starting at nums[l] are valid
+
+                count+=(r-l);
+                l++; // Move left pointer inward to check next element
+            }else{
+                r--; // Sum is >= target, shrink right pointer to reduce sum
+            }
+        }
+        return count;
+    }
+}
+
+```
+**Step-by-Step Dry Run (Case 1)**
+
+- **Input:** `nums = [-1, 1, 2, 3, 1]`, `target = 2`
+
+- **Sort:** `nums = [-1, 1, 1, 2, 3]`
+
+- **Init:** `l = 0` (`-1`), `r = 4` (`3`), `count = 0`
+
+| **Iteration** | | **nums[l]** | | **nums[r]** | | **Sum** | | **Condition < target** | | **Count Update** | | **Pointer Update** |
+
+| `1` | | `-1` | | `3` | | `2` | | `2 < 2` ❌ | |`count = 0` | | `r--` (`r = 3`) |
+
+| `2` |  | `-1` | | `2` | | `1` | | `1 < 2` ✅ | | `count += (3 - 0)` **$\rightarrow$** `3` | | `l++` (`l = 1`) |
+
+| `3` | | `1` | | `2` | | `3` | | `3 < 2` ❌ | | `count = 3` | | `r--` (`r = 2`) |
+
+| `4` | | `1` | | `1` | | `2` | | `2 < 2` ❌| | `count = 3` | | `r--` (`r = 1`) |
+
+**Termination:** `l < r` (`1 < 1`) is `false`.
+
+**Final Output:** `3` (`Matches Expected!`).
+
