@@ -30,7 +30,7 @@ class Solution {
         int r= nums.length -1;
         while(i<nums.length){
             if(l<r){
-                float avg = (nums[l] + nums[r])/2;
+                float avg = (l + r)/2;
                 l++;
                 i++;
             }
@@ -39,6 +39,29 @@ class Solution {
     }
 }
 ```
+#### My mistakes: 
+#### 1. Using Index Values Instead of Array Elements
+```
+float avg = (l + r) / 2;
+```
+You are adding the index positions l and r together instead of the actual numbers inside the array at those indices (nums[l] and nums[r]).
+
+#### 2. Infinite Loop & Unused Variables
+* **Infinite Loop:** The loop condition is `while(i < nums.length)`. However, `i` is never incremented inside the loop, so `i < nums.length` stays `true` forever!
+
+* `r` never decrements: You increment `l++`, but `r` stays fixed at its initial value, breaking the two-pointer approach.
+
+#### 3. Scope Error (return avg; outside method)
+You declared `float avg` inside the `while` loop block:
+
+* Variable `avg` only exists inside that loop.
+
+* Trying to return `avg` outside the loop (and outside the method body due to mismatched closing braces) causes a `cannot find symbol` compiler error.
+
+* The method signature specifies an `int` return type `(public int distinctAverages)`, but `avg` is a `float`.
+
+#### 4. Braces Misplacement
+Your closing brace `}` on line 15 closes the `distinctAverages` method before the `return` statement on line 16, resulting in dangling code outside any method.
 ### Corrected answer:
 ```
 class Solution {
