@@ -177,3 +177,52 @@ Rather than dynamically tracking all character frequencies at once, this approac
 - Run a standard 2-pointer sliding window where `r` expands the window rightward and l shrinks it whenever `(window size - count of c) > k`.
 
 - Return the maximum window size observed across all unique character passes.
+
+### Corrected Answer (Sliding Window (Optimised)):
+```
+class Solution {
+    public int characterReplacement(String s, int k) {
+        int res = 0;
+        // Hash map to track character frequencies inside the current window [l ... r]
+        HashMap<Character, Integer> count = new HashMap<>();
+        
+        int maxof = 0; // Tracks the highest frequency of ANY single character in the window
+        int l = 0;     // Left pointer of the sliding window
+
+        // Expand the sliding window by moving right pointer 'r'
+        for (int r = 0; r < s.length(); r++) {
+            
+            // 1. Update frequency map for incoming character s.charAt(r)
+            count.put(s.charAt(r), count.getOrDefault(s.charAt(r), 0) + 1);
+            
+            // 2. Track the maximum frequency of a single character in the current window
+            maxof = Math.max(maxof, count.get(s.charAt(r)));
+
+            // 3. Validity Check:
+            // Window Length = (r - l + 1)
+            // Replacements required = Window Length - maxof
+            // If replacements required > k, the window is invalid -> shrink from left
+            while ((r - l + 1) - maxof > k) {
+                count.put(s.charAt(l), count.get(s.charAt(l)) - 1); // Decrement outgoing char frequency
+                l++; // Shrink window from the left
+            }
+
+            // 4. Record maximum valid window length found so far
+            res = Math.max(res, (r - l + 1));
+        }
+        return res;
+    }
+}
+```
+#### Explanation:
+1. How the Logic Works
+Why don't we recalculate `maxof` when shrinking the window `(l++)`?
+
+- A smaller `maxof` value cannot yield a window larger than our current max result (`res`).
+
+- Therefore, `maxof` only needs to increase when a new higher character count enters at `r`. Keeping `maxof` slightly stale during shrinking does not break the correctness because `res` is only updated when `(r - l + 1)` is actually valid.
+
+
+**Complexity Analysis**
+- **Time Complexity:** $O(N)$ — Single pass over string $s$. Pointers `l` and `r` only move forward.
+- **Space Complexity:** $O(26) = O(1)$ — Hash map stores frequencies for uppercase English letters.
