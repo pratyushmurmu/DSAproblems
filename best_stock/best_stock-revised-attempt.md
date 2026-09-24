@@ -63,3 +63,6 @@ class Solution {
     }
 }
 ````
+#### Time Complexity: $O(N^2)$ — Will get Time Limit Exceeded (TLE) on LeetCode for large inputs.
+
+#### Space Complexity: $O(1)$ (constant space)
