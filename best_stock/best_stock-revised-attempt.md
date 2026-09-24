@@ -66,3 +66,48 @@ class Solution {
 #### Time Complexity: $O(N^2)$ — Will get Time Limit Exceeded (TLE) on LeetCode for large inputs.
 
 #### Space Complexity: $O(1)$ (constant space)
+
+## Correct Approach (Sliding Window):
+```
+class Solution {
+    public int maxProfit(int[] prices) {
+        int l=0; // Buy pointer (left)
+        int r=1; // Sell pointer (right)
+        int maxProfit= 0;
+        while(r<prices.length){
+            // Check if the trade is profitable
+            if(prices[r] > prices[l]){
+                int profit = prices[r] - prices[l];
+                maxProfit = Math.max(maxProfit, profit);
+            }else{
+                // We found a price cheaper than our buy price.
+                // Slide 'l' directly to 'r' because 'r' is now our best buy day!
+                l = r;
+            }
+            r++; // Keep expanding the window to check future sell days
+        }
+        return maxProfit;
+    }
+}
+```
+#### Time Complexity: $O(N)$
+#### Space Complexity: $O(1)$
+
+The time complexity is $O(N)$ because each pointer (`l` and `r`) traverses the array at most once, moving strictly from left to right without ever stepping backward.
+
+#### Step-by-Step Breakdown
+1. The `r` (Sell) Pointer:
+- Starts at index `1` and increments by $1$ in every single iteration of the `while` loop (`r++`).
+- It moves from index `1` to `prices.length - 1`.
+- Therefore, the `while` loop executes at most $N - 1$ times.
+2. The `l` (Buy) Pointer:
+- Starts at index `0`.
+- When `prices[r] <= prices[l]`, `l` jumps directly to `r` (`l = r`).
+- Because `r` is moving forward, `l` only ever moves forward. It **never backtracks**.
+3. Operations Inside the Loop:
+- Comparing `prices[r]` with `prices[l]` takes $O(1)$ time.
+- Updating `maxProfit` takes $O(1)$ time.
+- Reassigning `l` or incrementing `r` takes $O(1)$ time.
+
+In the $O(N)$ Sliding Window: There is only one loop. Even when `l` jumps to `r`, no previous elements are ever re-visited. 
+**Total operations:** $N - 1 \approx O(N)$.
